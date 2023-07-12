@@ -38,6 +38,12 @@
 - hosts: all
   become: true
   gather_facts: true
+  vars:
+    repos_to_disable:
+      - rhceph-4-tools-for-rhel-{{ ansible_facts['distribution_major_version'] }}-{{ ansible_facts['architecture'] }}-rpms
+      - rhceph-4-mon-for-rhel-{{ ansible_facts['distribution_major_version'] }}-{{ ansible_facts['architecture'] }}-rpms
+      - rhceph-4-osd-for-rhel-{{ ansible_facts['distribution_major_version'] }}-{{ ansible_facts['architecture'] }}-rpms
+      - rhceph-5-tools-for-rhel-{{ ansible_facts['distribution_major_version'] }}-{{ ansible_facts['architecture'] }}-rpms
   tasks:
     - name: import_role ceph_defaults
       import_role:
@@ -50,6 +56,7 @@
           rhsm_repository:
             name: "rhceph-{{ ceph_rhcs_version }}-tools-for-rhel-8-{{ ansible_facts['architecture'] }}-rpms"
 
+<<<<<<< HEAD
     - name: enable ceph package repositories
       when: ceph_origin in ['community', 'ibm']
       block:
@@ -61,6 +68,12 @@
               rpm_key: "{{ ceph_stable_key if ceph_origin == 'community' else ceph_ibm_key }}"
               baseurl: "{{ ceph_community_repo_baseurl if ceph_origin == 'community' else ceph_ibm_repo_baseurl }}"
               paths: "{{ [ 'noarch', '$basearch' ] if ceph_origin == 'community' else [ '$basearch' ] }}"
+=======
+            - name: disable older rhceph repositories if any
+              rhsm_repository:
+                name: "{{ repos_to_disable }}"
+                state: absent
+>>>>>>> 887b89f (preflight: old repos disablement refactor)
 
         - name: configure ceph repository key
           rpm_key:
